@@ -1,28 +1,128 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <a-table :columns="columns" :data-source="data" bordered>
+    <template v-slot:name="{ text }">
+      <a>{{ text }}</a>
+    </template>
+  </a-table>
 </template>
-
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+// In the fifth row, other columns are merged into first column
+// by setting it's colSpan to be 0
+const renderContent = ({ text, index }) => {
+  const obj = {
+    children: text,
+    props: {},
+  };
+  if (index === 4) {
+    obj.props.colSpan = 0;
+  }
+  return obj;
+};
+
+const data = [
+  {
+    key: "1",
+    name: "John Brown",
+    age: 32,
+    tel: "0571-22098909",
+    phone: 18889898989,
+    address: "New York No. 1 Lake Park",
+  },
+  {
+    key: "2",
+    name: "Jim Green",
+    tel: "0571-22098333",
+    phone: 18889898888,
+    age: 42,
+    address: "London No. 1 Lake Park",
+  },
+  {
+    key: "3",
+    name: "Joe Black",
+    age: 32,
+    tel: "0575-22098909",
+    phone: 18900010002,
+    address: "Sidney No. 1 Lake Park",
+  },
+  {
+    key: "4",
+    name: "Jim Red",
+    age: 18,
+    tel: "0575-22098909",
+    phone: 18900010002,
+    address: "London No. 2 Lake Park",
+  },
+  {
+    key: "5",
+    name: "Jake White",
+    age: 18,
+    tel: "0575-22098909",
+    phone: 18900010002,
+    address: "Dublin No. 2 Lake Park",
+  },
+];
 
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
+  data() {
+    const columns = [
+      {
+        title: "Name",
+        dataIndex: "name",
+        customRender: ({ text, index }) => {
+          if (index < 4) {
+            return <a href="javascript:;">{text}</a>;
+          }
+          return {
+            children: <a href="javascript:;">{text}</a>,
+            props: {
+              colSpan: 5,
+            },
+          };
+        },
+      },
+      {
+        title: "Age",
+        dataIndex: "age",
+        customRender: renderContent,
+      },
+      {
+        title: "Home phone",
+        colSpan: 2,
+        dataIndex: "tel",
+        customRender: ({ text, index }) => {
+          const obj = {
+            children: text,
+            props: {},
+          };
+          if (index === 2) {
+            obj.props.rowSpan = 2;
+          }
+          // These two are merged into above cell
+          if (index === 3) {
+            obj.props.rowSpan = 0;
+          }
+          if (index === 4) {
+            obj.props.colSpan = 0;
+          }
+          return obj;
+        },
+      },
+      {
+        title: "Phone",
+        colSpan: 0,
+        dataIndex: "phone",
+        customRender: renderContent,
+      },
+      {
+        title: "Address",
+        dataIndex: "address",
+        customRender: renderContent,
+      },
+    ];
+    return {
+      data,
+      columns,
+    };
+  },
+};
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
